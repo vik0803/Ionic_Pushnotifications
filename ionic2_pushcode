@@ -1,0 +1,69 @@
+export class DashboardsPage {
+
+    @ViewChild('barCanvas') barCanvas;
+    @ViewChild('doughnutCanvas') doughnutCanvas;
+    @ViewChild('lineCanvas') lineCanvas;
+    userIdSelect:any='';userIdSelctData:any;
+   
+  constructor(public globalvariable: Globalvariable,public http: Http,public user: UserData,public alertCtrl: AlertController,public valservice: ValidationService,public bMode:BackgroundMode,public nativeAudio: NativeAudio,public localNotifications: LocalNotifications,public toastCtrl:ToastController,public storage: Storage,public navCtrl: NavController,public modalCtrl: ModalController,public navParams: NavParams,public push: Push) {
+
+
+    this.push.hasPermission()
+      .then((res: any) => {
+
+        if (res.isEnabled) {
+          console.log('We have permission to send push notifications');
+          this.initPush();
+        } else {
+            this.initPush();
+          console.log('We do not have permission to send push notifications');
+        }
+
+      });
+}
+  initPush()
+  {
+    const options: PushOptions = {
+       android: {
+          senderID: '926042191789'
+       },
+       ios: {
+           alert: 'true',
+           badge: true,
+           sound: 'false'
+       },
+       windows: {},
+       browser: {
+           pushServiceURL: 'http://push.api.phonegap.com/v1/push'
+       }
+    };
+    const pushObject: PushObject = this.push.init(options);
+    pushObject.on('notification').subscribe((notification: any) =>
+    {
+      let alert = this.alertCtrl.create({
+      title: "<b>HIII YOGESH. </b>",
+       buttons: [{
+       text: 'OK',
+       handler: () => {
+
+           }
+         }]
+       });
+       alert.present();
+
+    }
+    // console.log('Received a notification', notification)
+  );
+
+pushObject.on('registration').subscribe((registration: any) =>
+{
+  alert(registration.registrationId); // important for send fcm notifcations
+console.log('Device registered', registration.registrationId);
+});
+
+pushObject.on('error').subscribe(error => console.error('Error with Push plugin', error));
+
+  }
+
+
+}
